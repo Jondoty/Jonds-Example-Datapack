@@ -1,0 +1,44 @@
+Example Dialogue and explanations:
+
+1.
+Command that runs:
+scoreboard players set @a[x=-958,y=66,z=-366,distance=..5,scores={TalkTime=0},tag=!Dialogue1] DialogueTrigger 1
+         Sets a DialogueTrigger score, usually by visiting a location, having a certain item, having an item in a location, or triggered when player accepts a quest.
+         These are triggered externally of this function by another file in this function. A dialogue function will only run if a score is present to help mitigate lag.
+         A scores={TalkTime=0} selector is used as to ensure player is not in a current dialogue, as changing DialogueTrigger values mid-dialogue can cause skips in story and soft-locking.
+         tag=!Dialogue1 used to ensure player hasn't heard this dialogue before, and won't repeat unless tag specifically removed. All dialogues have a unique number.
+
+
+
+
+2.
+scoreboard players add @a[scores={DialogueTrigger=1..}] TalkTime 1
+       Adds a score of 1 every time this function is ran, counting up and used as a timing device for commands following it.
+       Timings are added at the pace of two hoppers feeding one item into each other, and having one hopper's signal read using a comparator.
+
+
+3.
+tellraw @a[scores={DialogueTrigger=1,TalkTime=1}] {"text":"<...> Hello! Sorry to keep you waiting!"}
+       Example of a Tellraw command that will occur at timing value 1. Can be anything from text, sounds, items, teleporting entities, spawning entities, whatever you might want to do!
+
+3b.
+tellraw @a[scores={DialogueTrigger=1,TalkTime=8}] {"text":"<...> Welcome to the world of Pokémon!"}
+       Difference in TalkTime values between commands determines how much of a delay there is. A difference of 7 is about my minimum gap between short sentences.
+       A hopper clock that is two hoppers going back and forth, comparator out of one end, runs at about 100 TalkTime additions per 70 realtime seconds.
+
+
+4.
+execute @s[scores={DialogueTrigger=1,TalkTime=15}] run give @s pixelmon:rare_candy
+execute @s[scores={DialogueTrigger=1,TalkTime=15}] run tp @e[x=-744,y=74,z=-242,dy=3,type=pixelmon:statue] -964.5 66 -406.0
+       Executes commands as the player, sometimes on the world (npcs tping in or out, particles, etc). Commands other than the execute can use the @s selector for only the player with this dialogue at this specific time.
+
+
+
+5.
+tag @s[scores={DialogueTrigger=1,TalkTime=16..}] add Dialogue1
+scoreboard players set @s[tag=Dialogue1] TalkTime 0
+scoreboard players set @s[tag=Dialogue1] DialogueTrigger 0
+       Ends the dialogue, and adds a tag as to not repeat.
+       Target selector of TalkTime=X.. is what will determine the ending time.
+       X should be equal to or greater than the final command in the series.
+       You can add time from the final command if you wish to have a slight delay before anything else can happen after this dialogue, I end the dialogue at the final value of the 4th part above usually.
